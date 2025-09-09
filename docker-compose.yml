@@ -1,0 +1,42 @@
+# Version du fichier Docker Compose
+version: '3.8'
+
+# Définir les services (conteneurs)
+services:
+  # --- Service MongoDB ---
+  mongo:
+    # Utiliser l’image officielle MongoDB
+    image: mongo:latest
+    # Nom de la boîte pour identifier
+    container_name: flemot-mongo-db
+    # Ouvrir le port 27017
+    ports:
+      - "27017:27017"
+    # Sauvegarder les données sur l’ordi (volume persistant)
+    volumes:
+      - mongo-data:/data/db
+    # Variables d’environnement pour configurer
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+
+  # --- Service API ---
+  api:
+    # Nom de la boîte API
+    container_name: flemot-api
+    # Construire l’image avec le Dockerfile du dossier ./backend
+    build:
+      context: ./backend
+    # Ouvrir le port 8000 sur l’ordi, relié à 8080 dans la boîte
+    ports:
+      - "8000:8080"
+    # Démarrer API après MongoDB
+    depends_on:
+      - mongo
+    # Charger les variables du fichier .env
+    env_file:
+      - .env
+
+# Définir le volume pour stocker les données MongoDB
+volumes:
+  mongo-data:
