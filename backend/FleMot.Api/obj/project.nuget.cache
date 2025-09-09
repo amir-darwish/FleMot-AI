@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "BPcIAZDutTY=",
+  "success": true,
+  "projectFilePath": "/home/amir/Desktop/FleMot-AI/backend/FleMot.Api/FleMot.Api.csproj",
+  "expectedPackageFiles": [
+    "/home/amir/.nuget/packages/microsoft.aspnetcore.openapi/9.0.6/microsoft.aspnetcore.openapi.9.0.6.nupkg.sha512",
+    "/home/amir/.nuget/packages/microsoft.openapi/1.6.17/microsoft.openapi.1.6.17.nupkg.sha512"
+  ],
+  "logs": []
+}
