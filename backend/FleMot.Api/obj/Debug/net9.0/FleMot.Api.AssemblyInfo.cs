@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FleMot.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c76b8bcb91c611d5ef735db9c9e95e070fd9900e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8164cf11507a44990ab32f0e4a9c10c6dfc95559")]
 [assembly: System.Reflection.AssemblyProductAttribute("FleMot.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FleMot.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
