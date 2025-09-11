@@ -1,2 +1,54 @@
-# Ignorer le fichier d'environnement local
+# # # # # # # # # # # # # # # # # # # # # #
+#      Fichier .gitignore pour FleMot      #
+# # # # # # # # # # # # # # # # # # # # # #
+
+# --- Variables d'environnement locales ---
+# Ne jamais versionner les secrets et les clés API
 .env
+
+# --- Fichiers système d'exploitation (OS) ---
+.DS_Store
+Thumbs.db
+
+# --- Configuration des IDEs ---
+# JetBrains (Rider, WebStorm)
+.idea/
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+
+# --- Backend : C# / .NET ---
+# Dossiers de compilation (les plus importants !)
+# Contiennent les fichiers .dll et .exe générés
+[Bb]in/
+[Oo]bj/
+
+# Fichiers de débogage
+*.pdb
+
+# Fichiers générés par l'utilisateur
+*.Generated.cs
+
+# Dossier de publication
+[Pp]ublish/
+
+# --- Frontend : React Native / Node.js ---
+# Le dossier des dépendances (TRÈS important de l'ignorer)
+node_modules/
+
+# Fichiers de log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dossiers de build natifs
+# Android
+/mobile-app/android/app/build/
+/mobile-app/android/.gradle/
+# iOS
+/mobile-app/ios/build/
+
+# Cache du bundler (Metro)
+.metro-cache/
