@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  api:
+    container_name: flemot-api
+
+    # Construction de l’image à partir du dossier backend
+    build:
+      context: ./backend
+
+    # Exposition du port 8000 sur la machine locale relié au port 8080 du conteneur
+    ports:
+      - "8000:8080"
+
+    # Attendre que le service mongo soit lancé avant de démarrer
+    depends_on:
+      - mongo
+
+    # Charger les variables d’environnement depuis le fichier .env
+    env_file:
+      - .env
+
+    # --- Partie spéciale pour le développement ---
+    # Synchronisation du code source entre la machine et le conteneur
+    volumes:
+      # Les modifications dans ./backend sont visibles immédiatement dans /src du conteneur
+      - ./backend:/src
+
+    # Lancement du serveur .NET en mode surveillance automatique
+    command: dotnet watch run --urls "http://*:8080"
+    # Redémarre l’application à chaque modification du code
