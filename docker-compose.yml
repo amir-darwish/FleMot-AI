@@ -5,7 +5,7 @@ services:
   # Il sert aussi bien en développement qu'en production locale
   mongo:
     
-    image: mongo:latest
+    image: mongo:8
     container_name: flemot-mongo-db
     
     ports:

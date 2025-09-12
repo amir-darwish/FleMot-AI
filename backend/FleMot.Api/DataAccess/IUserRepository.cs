@@ -1,0 +1,10 @@
+using FleMot.Api.Models.Entites;
+
+namespace FleMot.Api.DataAccess;
+
+public interface IUserRepository
+{
+    Task<User?> GetByAuthIdAsync(string authId);
+
+    Task CreateAsync(User user);
+}
