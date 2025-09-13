@@ -25,7 +25,9 @@ services:
     volumes:
       # Les modifications dans ./backend sont visibles immédiatement dans /src du conteneur
       - ./backend:/src
-
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
     # Lancement du serveur .NET en mode surveillance automatique
     command: dotnet watch run --urls "http://*:8080"
     # Redémarre l’application à chaque modification du code
