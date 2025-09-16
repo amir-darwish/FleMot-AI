@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "321890167840",
+    "project_id": "flemotv2",
+    "storage_bucket": "flemotv2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:321890167840:android:bcf2051c8f07fcdcf2e045",
+        "android_client_info": {
+          "package_name": "com.flemot.ia"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "321890167840-a6rvusutq9qn9lbbrdv4qeat73iuaksg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.flemot.ia",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "321890167840-pagqb07euvhs5nuppni2t6kl0ftf5388.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXVcph86x0C3ogqpaHxfWj26gXEGUMN4g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "321890167840-pagqb07euvhs5nuppni2t6kl0ftf5388.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
