@@ -5,7 +5,7 @@
 # --- Variables d'environnement locales ---
 # Ne jamais versionner les secrets et les clés API
 .env
-
+.env.dev
 # --- Fichiers système d'exploitation (OS) ---
 .DS_Store
 Thumbs.db
