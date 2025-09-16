@@ -17,8 +17,6 @@ services:
       - mongo
 
     # Charger les variables d’environnement depuis le fichier .env
-    env_file:
-      - .env
 
     # --- Partie spéciale pour le développement ---
     # Synchronisation du code source entre la machine et le conteneur
@@ -28,6 +26,8 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
-    # Lancement du serveur .NET en mode surveillance automatique
+      - MongoDbSettings__ConnectionString=${MONGO_CONNECTION_STRING}
+      - MongoDbSettings__DatabaseName=${MONGO_DATABASE_NAME}
+    
     command: dotnet watch run --urls "http://*:8080"
-    # Redémarre l’application à chaque modification du code
+    # ---------------------------------------------------------
