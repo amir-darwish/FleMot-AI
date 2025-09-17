@@ -41,6 +41,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 
+builder.Services.AddHttpClient<IGeminiService, GeminiService>();
 builder.Services.AddSingleton<IMongoClient>(s => 
     new MongoClient(builder.Configuration.GetValue<string>("MongoDbSettings:ConnectionString")));
 builder.Services.AddScoped<IMongoDatabase>(s => 
