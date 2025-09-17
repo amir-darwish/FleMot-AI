@@ -28,7 +28,7 @@ const LoginScreen = () => {
 
 
       const firebaseJwt = await firebaseUserCredential.user.getIdToken();
-      console.log("Le JWT pour notre backend est prêt.");
+      console.log("Le JWT pour notre backend est prêt. : ",firebaseJwt);
 
       const response = await axios.post('http://10.0.2.2:8000/api/auth/register', {}, {
         headers: { 'Authorization': `Bearer ${firebaseJwt}` }

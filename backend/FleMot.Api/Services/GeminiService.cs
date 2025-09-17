@@ -44,9 +44,17 @@ public class GeminiService : IGeminiService
         var geminiResponse = JsonSerializer.Deserialize<GeminiResponse>(jsonResponse);
 
         
-        var resultText = geminiResponse?.candidates?.FirstOrDefault()?.content?.parts?.FirstOrDefault()?.text ?? "No examples found.";
+        var rawText = geminiResponse?.candidates?.FirstOrDefault()?.content?.parts?.FirstOrDefault()?.text ?? "{}";
 
-        return resultText;
+
+        var cleanedJson = rawText.Trim().Replace("```json", "").Replace("```", "").Trim();
+
+        using var jsonDoc = JsonDocument.Parse(cleanedJson);
+        var examplesNode = jsonDoc.RootElement.GetProperty("examples");
+
+        var finalResult = string.Join("\n", examplesNode.EnumerateArray().Select(e => e.GetString() ?? ""));
+
+        return finalResult;
 
     }
     

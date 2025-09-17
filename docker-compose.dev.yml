@@ -28,6 +28,6 @@ services:
       - ASPNETCORE_URLS=http://+:8080
       - MongoDbSettings__ConnectionString=${MONGO_CONNECTION_STRING}
       - MongoDbSettings__DatabaseName=${MONGO_DATABASE_NAME}
-    
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
     command: dotnet watch run --urls "http://*:8080"
     # ---------------------------------------------------------
