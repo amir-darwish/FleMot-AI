@@ -19,6 +19,9 @@ public class User
     [BsonElement("wordCount")] 
     public int WordCount { get; set; } = 0;
     
+    [BsonElement("originalLanguage")]
+    public string OriginalLanguage { get; set; } = "English";
+    
     [BsonElement("createdAt")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     
