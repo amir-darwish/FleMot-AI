@@ -10,7 +10,6 @@ namespace FleMot.Api.Controllers;
 [Authorize]
 public class WordsController : ControllerBase
 {
-    // يحتاج فقط إلى الخدمة الجديدة
     private readonly IWordSearchService _wordSearchService;
 
     public WordsController(IWordSearchService wordSearchService)
@@ -21,12 +20,25 @@ public class WordsController : ControllerBase
     [HttpPost("search")]
     public async Task<IActionResult> SearchWord([FromBody] SearchRequest request)
     {
+        if (string.IsNullOrEmpty(request.Word))
+        {
+            return BadRequest("Le mot ne peut pas être vide.");
+        }
+
         var authId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (authId is null) return Unauthorized();
 
-        // أصبح الـ Controller بسيطًا جدًا: يستدعي الخدمة ويمرر لها المعلومات
         var examples = await _wordSearchService.SearchAsync(request.Word, authId);
 
+        if (examples.Length == 0)
+        {
+            return BadRequest("Le mot est introuvable ou n'est pas un mot français valide.");
+        }
+
         return Ok(new { Word = request.Word, Examples = examples });
+
+
+   
+
     }
 }
