@@ -1,6 +1,7 @@
 using FleMot.Api.Models.Gemini;
 using System.Text;
 using System.Text.Json;
+using FleMot.Api.Models.DTOs;
 namespace FleMot.Api.Services;
 
 public class GeminiService : IGeminiService
@@ -14,7 +15,7 @@ public class GeminiService : IGeminiService
         _configuration = configuration;
     }
 
-    public async Task<string> GetExamplesAsync(string word, int exampleCount)
+    public async Task<ExamplePairDto[]> GetExamplesAsync(string word, int exampleCount)
     {
         var apiKey = _configuration["GEMINI_API_KEY"];
         if (string.IsNullOrEmpty(apiKey))
@@ -23,8 +24,7 @@ public class GeminiService : IGeminiService
         }
         var apiUrl = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={apiKey}";
         
-        var prompt = $"Pour le mot français '{word}', génère {exampleCount} phrases d'exemples simples et pertinentes. Fournis la réponse sous forme d'un objet JSON contenant une liste nommée 'examples'.";
-        
+        var prompt = $"Pour le mot français '{word}', génère {exampleCount} phrases d'exemples. Pour chaque phrase, fournis aussi une traduction en English. Fournis la réponse **uniquement sous la forme d'un objet JSON** contenant un tableau (array) nommé 'examples'. Chaque objet dans le tableau doit avoir deux clés : 'sentence' pour la phrase en français, et 'translation' pour la traduction en English.";        
         
 
         
@@ -40,22 +40,31 @@ public class GeminiService : IGeminiService
         //Read result
         response.EnsureSuccessStatusCode();
         var jsonResponse = await response.Content.ReadAsStringAsync();
+
+        try
+        {
+            
+            using var doc = JsonDocument.Parse(jsonResponse);
         
-        var geminiResponse = JsonSerializer.Deserialize<GeminiResponse>(jsonResponse);
-
+            var rawText = doc.RootElement
+                .GetProperty("candidates")[0]
+                .GetProperty("content")
+                .GetProperty("parts")[0]
+                .GetProperty("text")
+                .GetString() ?? "{}";
         
-        var rawText = geminiResponse?.candidates?.FirstOrDefault()?.content?.parts?.FirstOrDefault()?.text ?? "{}";
+            var cleanedJson = rawText.Trim().Replace("```json", "").Replace("```", "").Trim();
 
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var examplesDto = JsonSerializer.Deserialize<ExamplesDto>(cleanedJson, options);
 
-        var cleanedJson = rawText.Trim().Replace("```json", "").Replace("```", "").Trim();
-
-        using var jsonDoc = JsonDocument.Parse(cleanedJson);
-        var examplesNode = jsonDoc.RootElement.GetProperty("examples");
-
-        var finalResult = string.Join("\n", examplesNode.EnumerateArray().Select(e => e.GetString() ?? ""));
-
-        return finalResult;
-
+            return examplesDto?.Examples ?? Array.Empty<ExamplePairDto>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error parsing Gemini response: {ex.Message}");
+            return Array.Empty<ExamplePairDto>();
+        }
     }
     
 }

@@ -1,3 +1,5 @@
+using FleMot.Api.Models.DTOs;
+
 namespace FleMot.Api.Services;
 
 public class WordSearchService : IWordSearchService
@@ -11,7 +13,7 @@ public class WordSearchService : IWordSearchService
         _geminiService = geminiService;
     }
 
-    public async  Task<string> SearchAsync(string word, string authId)
+    public async  Task<ExamplePairDto[]> SearchAsync(string word, string authId)
     {
         var user = await _userService.RegisterOrGetUserAsync(authId);
         var exampleCount = user.Role.Equals("premium", StringComparison.OrdinalIgnoreCase) ? 4 : 2;

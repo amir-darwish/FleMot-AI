@@ -1,6 +1,8 @@
+using FleMot.Api.Models.DTOs;
+
 namespace FleMot.Api.Services;
 
 public interface IGeminiService
 {
-    Task<string> GetExamplesAsync(string word, int exampleCount);
+    Task<ExamplePairDto[]> GetExamplesAsync(string word, int exampleCount);
 }

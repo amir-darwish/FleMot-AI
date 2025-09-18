@@ -1,6 +1,8 @@
+using FleMot.Api.Models.DTOs;
+
 namespace FleMot.Api.Services;
 
 public interface IWordSearchService
 {
-    public Task<string> SearchAsync(string word,string authId);
+    public Task<ExamplePairDto[]> SearchAsync(string word,string authId);
 }
