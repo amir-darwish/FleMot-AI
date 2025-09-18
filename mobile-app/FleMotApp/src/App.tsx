@@ -2,7 +2,7 @@ import React, { useState, useEffect, createContext, useContext } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Keychain from 'react-native-keychain';
-
+import auth from '@react-native-firebase/auth';
 import LoginScreen from './screens/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
 import ResultsScreen from './screens/ResultsScreen';
@@ -16,22 +16,24 @@ const App = () => {
   const [userToken, setUserToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    // Au démarrage de l'app, on vérifie si un token est déjà sauvegardé
-    const bootstrapAsync = async () => {
-      try {
-        const credentials = await Keychain.getGenericPassword();
-        if (credentials) {
-          setUserToken(credentials.password); // Le token est stocké dans le champ "password"
-        }
-      } catch (e) {
-        console.error("Erreur lors de la récupération du token", e);
-      }
-      setIsLoading(false);
-    };
+useEffect(() => {
 
-    bootstrapAsync();
-  }, []);
+  const subscriber = auth().onIdTokenChanged(async (user) => {
+    if (user) {
+      const token = await user.getIdToken();
+      await Keychain.setGenericPassword('userToken', token);
+      setUserToken(token);
+    } else {
+      await Keychain.resetGenericPassword();
+      setUserToken(null);
+    }
+    if (isLoading) {
+      setIsLoading(false);
+    }
+  });
+
+  return subscriber;
+}, []);
 
   // Fonctions pour changer l'état de connexion depuis n'importe où dans l'app
   const authContext = {
