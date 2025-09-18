@@ -5,6 +5,7 @@ import Keychain from 'react-native-keychain';
 
 import LoginScreen from './screens/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
+import ResultsScreen from './screens/ResultsScreen';
 
 // Création d'un "contexte" pour partager l'état d'authentification dans toute l'app
 const AuthContext = createContext<{ userToken: string | null; signIn: (token: string) => void; signOut: () => void; } | null>(null);
@@ -59,7 +60,10 @@ const App = () => {
             <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
           ) : (
             // Si un token existe, on affiche l'écran d'accueil
-            <Stack.Screen name="Home" component={HomeScreen} />
+            <>
+              <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'Accueil' }}/>
+              <Stack.Screen name="Results" component={ResultsScreen} options={{ title: 'Résultats' }} />
+            </>
           )}
         </Stack.Navigator>
       </NavigationContainer>
