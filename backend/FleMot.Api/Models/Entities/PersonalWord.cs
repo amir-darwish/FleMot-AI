@@ -16,9 +16,9 @@ public class PersonalWord
     [BsonElement("word")]
     public string Word { get; set; } = null!;
     
-    [BsonElement("geminiReponse")]
-    public BsonDocument GeminiReponse { get; set; } = null!;
+    [BsonElement("geminiResponse")]
+    public BsonDocument GeminiResponse { get; set; } = null!;
     
-    [BsonElement("saveAt")]
-    public DateTime SaveAt { get; set; } = DateTime.UtcNow;
+    [BsonElement("savedAt")]
+    public DateTime SavedAt { get; set; } = DateTime.UtcNow;
 }
