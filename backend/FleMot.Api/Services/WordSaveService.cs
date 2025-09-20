@@ -1,5 +1,6 @@
 using System.Text.Json;
 using FleMot.Api.DataAccess;
+using FleMot.Api.Exceptions;
 using FleMot.Api.Models.DTOs;
 using FleMot.Api.Models.Entites;
 using MongoDB.Bson;
@@ -20,25 +21,25 @@ public class WordSaveService : IWordSaveService
         var user = await _userRepository.GetByAuthIdAsync(authId);
         if (user == null || user.Id == null)
         {
-            throw new Exception("User not found");
+            throw new UserNotFoundException(user.Id);
         }
 
         var exists = await _personalWordRepository.ExistsAsync(user.Id, data.Word);
         if (exists)
         {
-            throw new Exception("Word already exists");
+            throw new DuplicateWordException(data.Word);
         }
 
         if (user.Role == "standard" && user.WordCount >= 10)
         {
-            throw new Exception("Limit of 10 words reached");
+            throw new SaveLimitExceededException();
         }
         
         var newPersonalWord = new PersonalWord
         {
             UserId = user.Id,
             Word = data.Word,
-            GeminiResponse = BsonDocument.Parse(JsonSerializer.Serialize(data.Examples)), 
+            Examples = data.Examples, 
             SavedAt = DateTime.UtcNow
         };
 
