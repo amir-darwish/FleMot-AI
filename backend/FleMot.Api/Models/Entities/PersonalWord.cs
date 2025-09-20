@@ -1,3 +1,4 @@
+using FleMot.Api.Models.DTOs;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -16,8 +17,8 @@ public class PersonalWord
     [BsonElement("word")]
     public string Word { get; set; } = null!;
     
-    [BsonElement("geminiResponse")]
-    public BsonDocument GeminiResponse { get; set; } = null!;
+    [BsonElement("examples")]
+    public ExamplePairDto[] Examples { get; set; } = Array.Empty<ExamplePairDto>();
     
     [BsonElement("savedAt")]
     public DateTime SavedAt { get; set; } = DateTime.UtcNow;
