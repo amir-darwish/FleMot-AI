@@ -1,14 +1,9 @@
 using Moq;
-using Moq.Contrib.HttpClient;
-using System.Net;
-using System.Text.Json;
 using FleMot.Api.DataAccess;
 using FleMot.Api.Exceptions;
 using FleMot.Api.Services;
 using FleMot.Api.Models.DTOs;
 using FleMot.Api.Models.Entites;
-using FleMot.Api.Models.Gemini;
-using Microsoft.Extensions.Configuration;
 namespace FleMot.Api.Tests;
 
 public class WordSaveServiceTests
