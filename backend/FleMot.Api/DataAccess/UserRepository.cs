@@ -29,5 +29,12 @@ public class UserRepository: IUserRepository
         var update = Builders<User>.Update.Inc(u => u.WordCount, 1);
         await _usersCollection.UpdateOneAsync(filter, update);
     }
+    
+    public async Task DecrementWordCountAsync(string userId)
+    {
+        var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
+        var update = Builders<User>.Update.Inc(u => u.WordCount, -1);
+        await _usersCollection.UpdateOneAsync(filter, update);
+    }
 
 }

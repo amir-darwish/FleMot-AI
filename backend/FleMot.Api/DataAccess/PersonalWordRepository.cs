@@ -24,5 +24,18 @@ public class PersonalWordRepository : IPersonalWordRepository
     {
          await _personalWordCollection.InsertOneAsync(word);
     }
-     // 
+     
+    public async Task<List<PersonalWord>> GetByUserIdAsync(string userId)
+    {
+       return await _personalWordCollection.Find(pw => userId == pw.UserId).ToListAsync();
+    }
+    public async Task<PersonalWord?> GetByIdAsync(string id)
+    {
+        return await _personalWordCollection.Find(pw => pw.Id == id).FirstOrDefaultAsync();
+    }
+    public async Task<bool> DeleteAsync(string id)
+    {
+        var result = await _personalWordCollection.DeleteOneAsync(pw => pw.Id == id);
+        return result.DeletedCount > 0;
+    }
 }
