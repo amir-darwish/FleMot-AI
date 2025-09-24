@@ -7,4 +7,9 @@ public interface IUserRepository
     Task<User?> GetByAuthIdAsync(string authId);
 
     Task CreateAsync(User user);
-    Task IncrementWordCountAsync(string userId);}
+    Task IncrementWordCountAsync(string userId);
+    
+    Task DecrementWordCountAsync(string userId);
+}
+    
+    

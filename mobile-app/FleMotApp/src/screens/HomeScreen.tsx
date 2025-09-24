@@ -32,8 +32,9 @@ const HomeScreen = () => {
         { word: word },
         { headers: { 'Authorization': `Bearer ${token}` } }
       );
+      const isAlreadySaved = authContext?.savedWords.has(word) ?? false;
 
-      navigation.navigate('Results', { searchResult: response.data });
+      navigation.navigate('Results', { searchResult: response.data , isAlreadySaved: isAlreadySaved});
 
     } catch (error: any) {
       console.error("Erreur de recherche:", error.response?.data || error.message);
@@ -65,9 +66,6 @@ const HomeScreen = () => {
         )}
       </TouchableOpacity>
 
-      <View style={styles.logoutButtonContainer}>
-        <Button title="Se déconnecter" color="#d9534f" onPress={() => authContext?.signOut()} />
-      </View>
     </View>
   );
 };

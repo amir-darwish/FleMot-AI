@@ -6,11 +6,12 @@ type ExamplePair = { sentence: string; translation: string; };
 type SearchResult = { word: string; examples: ExamplePair[]; };
 
 const ResultsScreen = ({ route }: any) => {
-  const { searchResult } = route.params as { searchResult: SearchResult };
 
+  const { searchResult, isAlreadySaved } = route.params as { searchResult: SearchResult, isAlreadySaved: boolean };
   const [isSaving, setIsSaving] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
+  const [isSaved, setIsSaved] = useState(isAlreadySaved);
   const [feedback, setFeedback] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
 
   useEffect(() => {
     if (feedback) {
@@ -68,19 +69,21 @@ const ResultsScreen = ({ route }: any) => {
         keyExtractor={(item, index) => index.toString()}
         ListEmptyComponent={<Text style={styles.emptyText}>Aucun exemple trouvé.</Text>}
       />
-      <TouchableOpacity
-        style={[styles.saveButton, (isSaved || isSaving) && styles.disabledButton]}
-        onPress={handleSave}
-        disabled={isSaved || isSaving}
-      >
-        {isSaving ? (
-          <ActivityIndicator color="#FFFFFF" />
-        ) : isSaved ? (
-          <Text style={styles.saveButtonText}>Sauvegardé ✓</Text>
-        ) : (
-          <Text style={styles.saveButtonText}>+ Sauvegarder ce mot</Text>
-        )}
-      </TouchableOpacity>
+       {!isAlreadySaved && (
+        <TouchableOpacity
+          style={[styles.saveButton, (isSaved || isSaving) && styles.disabledButton]}
+          onPress={handleSave}
+          disabled={isSaved || isSaving}
+        >
+          {isSaving ? (
+            <ActivityIndicator color="#FFFFFF" />
+          ) : isSaved ? (
+            <Text style={styles.saveButtonText}>Sauvegardé ✓</Text>
+          ) : (
+            <Text style={styles.saveButtonText}>+ Sauvegarder ce mot</Text>
+          )}
+        </TouchableOpacity>
+      )}
     </View>
   );
 };

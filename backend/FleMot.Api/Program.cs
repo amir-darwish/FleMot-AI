@@ -68,6 +68,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             }
         };
     });
+builder.Services.AddScoped<IWordListService, WordListService>();
 builder.Services.AddScoped<IWordSaveService, WordSaveService>();
 builder.Services.AddScoped<IPersonalWordRepository, PersonalWordRepository>();
 builder.Services.AddScoped<IWordSearchService, WordSearchService>();

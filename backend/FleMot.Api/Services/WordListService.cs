@@ -48,6 +48,7 @@ public class WordListService : IWordListService
         }
         
         await _personalWordRepository.DeleteAsync(wordId);
+        await _userRepository.DecrementWordCountAsync(user.Id);
         
     }
 }
