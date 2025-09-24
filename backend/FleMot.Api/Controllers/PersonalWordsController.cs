@@ -12,10 +12,11 @@ namespace FleMot.Api.Controllers;
 public class PersonalWordsController : ControllerBase
 {
     private readonly IWordSaveService _wordSaveService;
-    
-    public PersonalWordsController(IWordSaveService wordSaveService)
+    private readonly IWordListService _wordListService;
+    public PersonalWordsController(IWordSaveService wordSaveService, IWordListService wordListService)
     {
         _wordSaveService = wordSaveService;
+        _wordListService = wordListService;
     }
 
     [HttpPost]
@@ -46,4 +47,51 @@ public class PersonalWordsController : ControllerBase
             return StatusCode(500, "Une erreur interne est survenue.");
         }
     }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetUserWords()
+    {
+        try
+        {
+            var authId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (authId is null) return Unauthorized("Token invalide.");
+            
+            var words = await _wordListService.GetUserWordListAsync(authId);
+            return Ok(words);
+        }
+        catch (UserNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, "Une erreur interne est survenue.");
+        }
+    }
+    
+    [HttpDelete("{wordId}")]
+    public async Task<IActionResult> DeleteWord(string wordId)
+    {
+        try
+        {
+            var authId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (authId is null) return Unauthorized("Token invalide.");
+            
+            await _wordListService.DeleteWordAsync(authId, wordId);
+            return NoContent();
+        }
+        catch (UserNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (WordNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, "Une erreur interne est survenue.");
+        }
+    }
+    
 }
