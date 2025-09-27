@@ -2,10 +2,8 @@
 using System.Net.Http.Json;
 using FleMot.Api.Models.DTOs;
 using FleMot.Api.Models.Entites;
-using FleMot.Api.Services;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
-using Moq;
 
 
 namespace FleMot.Api.Tests;
@@ -13,7 +11,18 @@ namespace FleMot.Api.Tests;
 public class PersonalWordsControllerTests : IClassFixture<FleMotApiFactory>
 {
     private readonly FleMotApiFactory _factory;
-    public PersonalWordsControllerTests(FleMotApiFactory factory) => _factory = factory;
+    private readonly IServiceScopeFactory _scopeFactory;
+    public PersonalWordsControllerTests(FleMotApiFactory factory)
+    {
+        _factory = factory;
+        
+        _scopeFactory = _factory.Services.GetRequiredService<IServiceScopeFactory>();
+
+        // Clean up the database before each test
+        using var scope = _scopeFactory.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<IMongoDatabase>();
+        db.Client.DropDatabase("TestDb");
+    }
 
     [Fact]
     public async Task SaveWord_WhenUserIsStandardAndAtLimit_ShouldReturnForbidden()
@@ -22,14 +31,13 @@ public class PersonalWordsControllerTests : IClassFixture<FleMotApiFactory>
         var client = _factory.CreateClient();
         
         // create a scope to access the database
-        var scopeFactory = _factory.Services.GetRequiredService<IServiceScopeFactory>();
-        using var scope = scopeFactory.CreateScope();
-        
-        var db = scope.ServiceProvider.GetRequiredService<IMongoDatabase>();
-        var usersCollection = db.GetCollection<User>("users");
-        
-        var testUser = new User{ AuthId = "test-auth-id", Role = "standard", WordCount = 10 };
-        await usersCollection.InsertOneAsync(testUser);
+        using (var scope = _scopeFactory.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<IMongoDatabase>();
+            var usersCollection = db.GetCollection<User>("users");
+            var testUser = new User { AuthId = "test-auth-id", Role = "standard", WordCount = 10 };
+            await usersCollection.InsertOneAsync(testUser);
+        }
         
         var wordToSave = new SaveWordRequest("mot_numero_11", Array.Empty<ExamplePairDto>());
         
@@ -47,15 +55,14 @@ public class PersonalWordsControllerTests : IClassFixture<FleMotApiFactory>
         // --- ARRANGE ---
         var client = _factory.CreateClient();
         
-        // create a scope to access the database
-        var scopeFactory = _factory.Services.GetRequiredService<IServiceScopeFactory>();
-        using var scope = scopeFactory.CreateScope();
-        
-        var db = scope.ServiceProvider.GetRequiredService<IMongoDatabase>();
-        var usersCollection = db.GetCollection<User>("users");
-        
-        var testUser = new User{ AuthId = "test-auth-id", Role = "standard", WordCount = 5 };
-        await usersCollection.InsertOneAsync(testUser);
+        // create a scope to access the database and 
+        using (var scope = _scopeFactory.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<IMongoDatabase>();
+            var usersCollection = db.GetCollection<User>("users");
+            var testUser = new User { AuthId = "test-auth-id", Role = "standard", WordCount = 5 };
+            await usersCollection.InsertOneAsync(testUser);
+        }
         
         var wordToSave = new SaveWordRequest("mot_numero_6", Array.Empty<ExamplePairDto>());
         
@@ -79,8 +86,12 @@ public class PersonalWordsControllerTests : IClassFixture<FleMotApiFactory>
         Assert.NotNull(savedWord);
         Assert.Equal("mot_numero_6", savedWord.Word);
         
-        var updatedUser = await usersCollection.Find(u => u.AuthId == "test-auth-id").SingleAsync();
-        
-        Assert.Equal(6, updatedUser.WordCount);
+        using (var scope = _scopeFactory.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<IMongoDatabase>();
+            var usersCollection = db.GetCollection<User>("users");
+            var updatedUser = await usersCollection.Find(u => u.AuthId == "test-auth-id").SingleAsync();
+            Assert.Equal(6, updatedUser.WordCount);
+        }
     }
 }
