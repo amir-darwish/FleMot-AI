@@ -27,8 +27,8 @@ public class PersonalWordsController : ControllerBase
             var authId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (authId is null) return Unauthorized("Token invalide.");
             
-            await _wordSaveService.SaveWordAsync(authId, request);
-            return StatusCode(201); // Created
+            var savedWord = await _wordSaveService.SaveWordAsync(authId, request);
+            return Created($"/api/personalwords/{savedWord.Id}", savedWord); // Created
         } catch (UserNotFoundException ex)
         {
             return NotFound(new { message = ex.Message });

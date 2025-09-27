@@ -16,7 +16,7 @@ public class WordSaveService : IWordSaveService
         _userRepository = userRepository;
         _personalWordRepository = personalWordRepository;
     }
-    public async Task SaveWordAsync(string authId, SaveWordRequest data)
+    public async Task<PersonalWord> SaveWordAsync(string authId, SaveWordRequest data)
     {
         var user = await _userRepository.GetByAuthIdAsync(authId);
         if (user == null || user.Id == null)
@@ -46,6 +46,7 @@ public class WordSaveService : IWordSaveService
         await _personalWordRepository.CreateAsync(newPersonalWord);
         user.WordCount += 1;
         await _userRepository.IncrementWordCountAsync(user.Id);
+        return newPersonalWord;
 
     }
 }
