@@ -47,6 +47,16 @@ public class FleMotApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
                 .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", _ => { });
         });
     }
+    
+    public HttpClient CreateClientWithServices(Action<IServiceCollection> servicesConfiguration)
+    {
+        var client = WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureTestServices(servicesConfiguration);
+        }).CreateClient();
+        
+        return client;
+    }
 
     // start and stop the test container
     public async Task InitializeAsync() => await _mongoDbContainer.StartAsync();
