@@ -1,67 +1,60 @@
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace FleMot.Api.Tests;
 
 public class AuthControllerTests : IClassFixture<FleMotApiFactory>
 {
-    private readonly HttpClient _client;
+    private readonly FleMotApiFactory _factory;
 
     public AuthControllerTests(FleMotApiFactory factory)
     {
-        _client = factory.CreateClient();
+        _factory = factory;
     }
 
     [Fact]
     public async Task RegisterAsync_WithoutToken_ShouldReturnUnauthorized()
     {
-        // --- ARRANGE --- 
-        
-        // empty setup as no token is provided //
+        // ARRANGE
+        // Create a standard client. Since the base factory doesn't
+        // add the TestAuthHandler, this client is unauthenticated.
+        var client = _factory.CreateClient();
 
+        // ACT
+        var response = await client.PostAsync("/api/auth/register", null);
 
-        // --- ACT  ---
-        var response = await _client.PostAsync("/api/auth/register", null);
-
-        // --- ASSERT ---
-     
+        // ASSERT
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
     
     [Fact]
     public async Task RegisterAsync_WithValidToken_ShouldCreateUserAndReturnOk()
     {
-        // --- ARRANGE ---
-        
-        // we use a fake handler that automatically authenticates the request
-        
-
-        // --- ACT ---
-
-        var response = await _client.PostAsync("/api/auth/register", null);
-
-        // --- ASSERT ---
-        try
+        // ARRANGE
+        // Create a special client for this test that INCLUDES the fake authentication handler.
+        var client = _factory.CreateClientWithServices(services =>
         {
-            response.EnsureSuccessStatusCode();
-        }
-        catch (HttpRequestException ex)
-        {
-            var errorContent = await response.Content.ReadAsStringAsync();
-            throw new HttpRequestException($"Request failed with status code {response.StatusCode}. Response content: {errorContent}", ex);
-        }
+            services.AddAuthentication("Test")
+                .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", _ => { });
+        });
+
+        // ACT
+        var response = await client.PostAsync("/api/auth/register", null);
+
+        // ASSERT
+        response.EnsureSuccessStatusCode();
     
-        // read the user from the response
         var user = await response.Content.ReadFromJsonAsync<User>(); 
     
         Assert.NotNull(user);
         Assert.Equal("test-auth-id", user.AuthId);
         Assert.Equal("standard", user.Role);
-
     }
 
+    // This record helps deserialize the JSON response
     public record User(string Id, string AuthId, string Role, int WordCount);
 }
