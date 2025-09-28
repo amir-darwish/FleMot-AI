@@ -1,4 +1,6 @@
+using System.Text.RegularExpressions;
 using FleMot.Api.Models.Entites;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace FleMot.Api.DataAccess;
@@ -12,13 +14,13 @@ public class PersonalWordRepository : IPersonalWordRepository
     }
     public async Task<bool> ExistsAsync(string userId, string word)
     {
+        var regexFilter = new BsonRegularExpression($"^{Regex.Escape(word)}$", "i");
+
         var filter = Builders<PersonalWord>.Filter.Eq(pw => pw.UserId, userId) &
-                     Builders<PersonalWord>.Filter.Eq(pw => pw.Word, word);
-        var result = await _personalWordCollection.Find(filter).FirstOrDefaultAsync();
-        
-        // If result is not null, the word exists for the user , we return true
-        // Otherwise, we return false
-        return result != null;
+                     Builders<PersonalWord>.Filter.Regex(pw => pw.Word, regexFilter);
+
+        var count = await _personalWordCollection.CountDocumentsAsync(filter);
+        return count > 0;
     }
     public async Task CreateAsync(PersonalWord word)
     {
