@@ -5,7 +5,6 @@ using FleMot.Api.Models.Entites;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
-using Xunit;
 
 namespace FleMot.Api.Tests;
 
@@ -67,7 +66,7 @@ public class PersonalWordsControllerTests : IClassFixture<FleMotApiFactory>, IAs
         var response = await client.PostAsJsonAsync("/api/personalwords",
             new SaveWordRequest("mot_numero_6", Array.Empty<ExamplePairDto>()));
 
-        var body = await response.Content.ReadAsStringAsync();
+      
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
         var savedWord = await response.Content.ReadFromJsonAsync<PersonalWord>();
@@ -87,7 +86,7 @@ public class PersonalWordsControllerTests : IClassFixture<FleMotApiFactory>, IAs
         var response = await client.PostAsJsonAsync("/api/personalwords",
             new SaveWordRequest("mot_numero_51", Array.Empty<ExamplePairDto>()));
 
-        var body = await response.Content.ReadAsStringAsync();
+      
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
         var savedWord = await response.Content.ReadFromJsonAsync<PersonalWord>();
@@ -119,14 +118,12 @@ public class PersonalWordsControllerTests : IClassFixture<FleMotApiFactory>, IAs
         // --- ACT ---
         var firstResponse = await client.PostAsJsonAsync("/api/personalwords",
             new SaveWordRequest("mot_existant", Array.Empty<ExamplePairDto>()));
-        var firstBody = await firstResponse.Content.ReadAsStringAsync();
         //Console.WriteLine($"=== First POST === Status: {firstResponse.StatusCode}, Body: {firstBody}");
         Assert.Equal(HttpStatusCode.Created, firstResponse.StatusCode);
 
         // --- ACT ---
         var secondResponse = await client.PostAsJsonAsync("/api/personalwords",
             new SaveWordRequest("mot_existant", Array.Empty<ExamplePairDto>()));
-        var secondBody = await secondResponse.Content.ReadAsStringAsync();
         //Console.WriteLine($"=== Second POST === Status: {secondResponse.StatusCode}, Body: {secondBody}");
 
         // --- ASSERT ---
