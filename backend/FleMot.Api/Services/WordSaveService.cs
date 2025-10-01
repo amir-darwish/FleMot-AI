@@ -23,12 +23,7 @@ public class WordSaveService : IWordSaveService
         {
             throw new UserNotFoundException(user.Id);
         }
-        // --- 👇 اطبع البيانات التي استقبلتها الخدمة ---
-        Console.WriteLine($"--- SERVICE CHECK ---");
-        Console.WriteLine($"User ID being checked: {user.Id}");
-        Console.WriteLine($"Word being checked: {data.Word}");
-        Console.WriteLine($"---------------------");
-        // ------------------------------------------
+
         var exists = await _personalWordRepository.ExistsAsync(user.Id, data.Word);
         if (exists)
         {
