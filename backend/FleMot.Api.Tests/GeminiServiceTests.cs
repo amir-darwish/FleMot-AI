@@ -32,7 +32,7 @@ public class GeminiServiceTests
         var httpClient = handler.CreateClient();
 
 
-        var expectedFullUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=fake-api-key";
+        var expectedFullUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=fake-api-key";
 
         handler.SetupRequest(HttpMethod.Post, expectedFullUrl)
             .ReturnsResponse(HttpStatusCode.OK, new StringContent(fakeJsonPayload));
