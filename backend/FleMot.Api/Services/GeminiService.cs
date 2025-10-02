@@ -24,7 +24,7 @@ public class GeminiService : IGeminiService
         {
             throw new InvalidOperationException("Gemini API Key is not configured.");
         }
-        var apiUrl = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={apiKey}";
+        var apiUrl = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={apiKey}";
         
         var prompt = $"Pour le mot français '{word}', génère {exampleCount} phrases d'exemples avec leur traduction en Anglais. " +
                      $"**Si le mot '{word}' n'est pas un mot français valide, retourne un objet JSON avec une seule clé 'error' contenant le message 'Le mot n''est pas français.'.** " +
