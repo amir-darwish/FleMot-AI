@@ -1,53 +1,81 @@
-import React, { useState, useEffect, createContext, useContext } from 'react';
+import React, { useState, useEffect, createContext, useContext, useCallback } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
 import Keychain from 'react-native-keychain';
 import auth from '@react-native-firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from './services/api';
-
+import { useNetInfo } from '@react-native-community/netinfo';
 import LoginScreen from './screens/LoginScreen';
 import DrawerNavigator from './navigation/DrawerNavigator';
 
+
+type PersonalWord = { id: string; word: string; examples: any[] };
 type AuthContextType = {
   userToken: string | null;
-  savedWords: Set<string>;
+  savedWords: PersonalWord[];
   isLoading: boolean;
-  updateSavedWords: (newWord: string) => void;
+  addWord: (word: PersonalWord) => void;
+  removeWord: (wordId: string) => void;
   signIn: (token: string) => Promise<void>;
   signOut: () => Promise<void>;
+  syncData: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const Stack = createStackNavigator();
-
-const LoadingScreen = () => (
-  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    <ActivityIndicator size="large" />
-  </View>
-);
-
 const App = () => {
   const [userToken, setUserToken] = useState<string | null>(null);
-  const [savedWords, setSavedWords] = useState<Set<string>>(new Set());
+  const [savedWords, setSavedWords] = useState<PersonalWord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const netInfo = useNetInfo();
+
+
+  const syncData = useCallback(async () => {
+    if (!userToken || !netInfo.isConnected) {
+        console.log("Offline or no token, skipping sync.");
+        return;
+    }
+    if (!netInfo.isConnected) {
+      console.log("Offline, skipping sync.");
+      return;
+    }
+    try {
+      console.log("Syncing data with server...");
+      const response = await api.get('/personalwords');
+      const serverWords: PersonalWord[] = response.data;
+      await AsyncStorage.setItem('savedWords', JSON.stringify(serverWords));
+      setSavedWords(serverWords);
+      console.log("Sync complete!");
+    } catch (e) {
+      console.error("Failed to sync data", e);
+    }
+  }, [netInfo.isConnected]);
+
 
   useEffect(() => {
     const bootstrapAsync = async () => {
       try {
         const credentials = await Keychain.getGenericPassword();
         if (credentials) {
-          setUserToken(credentials.password);
+          const token = credentials.password;
+          setUserToken(token);
+          const localData = await AsyncStorage.getItem('savedWords');
+          if (localData) {
+            setSavedWords(JSON.parse(localData));
+          }
         }
-      } catch (e) {
-        console.error("Erreur de bootstrap", e);
-      }
+      } catch (e) { console.error("Bootstrap error", e); }
       setIsLoading(false);
     };
-
     bootstrapAsync();
   }, []);
+
+  useEffect(() => {
+    if (userToken && netInfo.isConnected === true) {
+      syncData();
+    }
+  }, [netInfo.isConnected, userToken, syncData]);
 
   const authContext: AuthContextType = {
     userToken,
@@ -56,47 +84,42 @@ const App = () => {
     signIn: async (token: string) => {
       setIsLoading(true);
       await Keychain.setGenericPassword('userToken', token);
-      try {
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        const response = await api.get('/personalwords');
-        const words = response.data.map((item: any) => item.word);
-        setSavedWords(new Set(words));
-      } catch (error) {
-        console.error("Failed to fetch personal words on sign-in", error);
-      }
       setUserToken(token);
+      await syncData();
       setIsLoading(false);
     },
     signOut: async () => {
       await auth().signOut();
       await Keychain.resetGenericPassword();
-      setSavedWords(new Set());
+      await AsyncStorage.removeItem('savedWords');
+      setSavedWords([]);
       setUserToken(null);
     },
-    updateSavedWords: (newWord: string) => {
-      setSavedWords(prevWords => new Set(prevWords).add(newWord));
+    addWord: (newWord: PersonalWord) => {
+      const newWords = [...savedWords, newWord];
+      setSavedWords(newWords);
+      AsyncStorage.setItem('savedWords', JSON.stringify(newWords));
     },
+    removeWord: (wordId: string) => {
+      const newWords = savedWords.filter(w => w.id !== wordId);
+      setSavedWords(newWords);
+      AsyncStorage.setItem('savedWords', JSON.stringify(newWords));
+    },
+    syncData,
   };
+
+  if (isLoading) {
+    return <View style={{ flex: 1, justifyContent: 'center' }}><ActivityIndicator size="large" /></View>;
+  }
 
   return (
     <AuthContext.Provider value={authContext}>
       <NavigationContainer>
-        <Stack.Navigator>
-          {isLoading ? (
-            <Stack.Screen name="Loading" component={LoadingScreen} options={{ headerShown: false }} />
-          ) : userToken == null ? (
-            <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
-          ) : (
-            <Stack.Screen name="AppDrawer" component={DrawerNavigator} options={{ headerShown: false }} />
-          )}
-        </Stack.Navigator>
+        {userToken == null ? <LoginScreen /> : <DrawerNavigator />}
       </NavigationContainer>
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
-
+export const useAuth = () => useContext(AuthContext);
 export default App;

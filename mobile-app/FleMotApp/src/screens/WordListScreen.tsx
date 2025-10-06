@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback} from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,8 @@ import {
   ActivityIndicator
 } from 'react-native';
 import api from '../services/api';
-import { useNavigation, useIsFocused } from '@react-navigation/native';
+import {useAuth} from '../App';
+import { useNavigation, useIsFocused, useFocusEffect} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Feather';
 
 type PersonalWord = {
@@ -19,28 +20,17 @@ type PersonalWord = {
 };
 
 const WordListScreen = () => {
-  const [words, setWords] = useState<PersonalWord[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const authContext = useAuth();
   const navigation = useNavigation<any>();
-  const isFocused = useIsFocused();
 
-  const fetchWords = async () => {
-    setIsLoading(true);
-    try {
-      const response = await api.get('/personalwords');
-      setWords(response.data);
-    } catch (error) {
-      Alert.alert("Erreur", "Impossible de charger votre liste de mots.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const words = authContext?.savedWords ?? [];
+  const isLoading = authContext?.isLoading ?? true;
 
-  useEffect(() => {
-    if (isFocused) {
-      fetchWords();
-    }
-  }, [isFocused]);
+    useFocusEffect(
+      useCallback(() => {
+        authContext?.syncData();
+      }, [])
+    );
 
   const handleDelete = async (wordId: string) => {
     Alert.alert(
@@ -52,11 +42,15 @@ const WordListScreen = () => {
           text: "Supprimer",
           style: "destructive",
           onPress: async () => {
+               const originalWords = authContext?.savedWords ?? [];
+               authContext?.removeWord(wordId);
+
             try {
               await api.delete(`/personalwords/${wordId}`);
-              setWords(currentWords => currentWords.filter(word => word.id !== wordId));
+              authContext?.removeWord(wordId);
             } catch (error) {
-              Alert.alert("Erreur", "Impossible de supprimer le mot.");
+                console.error("Delete failed, probably offline.", error);
+                Alert.alert("Erreur", "L'opération a échoué. Vérifiez votre connexion internet.");
             }
           }
         }
@@ -91,7 +85,7 @@ const WordListScreen = () => {
           <TouchableOpacity style={styles.card} onPress={() => handleWordPress(item)}>
             <Text style={styles.wordText}>{item.word}</Text>
             <TouchableOpacity onPress={() => handleDelete(item.id)}>
-              <Icon name="trash-2" size={24} color="#d9534f" />
+                <Icon name="trash-2" size={24} color="#d9534f" />
             </TouchableOpacity>
           </TouchableOpacity>
         )}
@@ -99,7 +93,7 @@ const WordListScreen = () => {
           <Text style={styles.title}>Mes Mots Sauvegardés</Text>
         }
         ListEmptyComponent={
-          <Text style={styles.emptyText}>Votre liste est vide. Commencez par sauvegarder des mots !</Text>
+          <Text style={styles.emptyText}>Votre liste est vide.</Text>
         }
       />
     </View>
