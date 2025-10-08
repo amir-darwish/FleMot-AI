@@ -15,7 +15,7 @@ public class FleMotApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     private readonly IContainer _mongoDbContainer = new ContainerBuilder()
         .WithImage("mongo:7.0")
         .WithPortBinding(27017, true)
-        .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(27017))
+        .WithWaitStrategy(Wait.ForUnixContainer().UntilInternalTcpPortIsAvailable(27017))
         .Build();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
