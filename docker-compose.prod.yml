@@ -1,28 +1,26 @@
-# Version du fichier Docker Compose
-version: '3.8'
-
+# الملف: docker-compose.prod.yml
 services:
   api:
-    # Nom du conteneur pour l’API en production
     container_name: flemot-api
-
-    # Construction de l’image à partir du dossier backend, même Dockerfile que pour dev
+    # يبني الصورة باستخدام Dockerfile (الذي ينشئ النسخة المحسنة للإنتاج)
     build:
       context: ./backend
-
+    
     ports:
       - "8000:8080"
 
-    # Démarrage après que MongoDB soit prêt
-    depends_on:
-      - mongo
+    # في الإنتاج الحقيقي، غالبًا ما تكون قاعدة البيانات خارجية،
+    # لذلك يمكن إزالة depends_on. لكن يمكننا تركه في CI/CD.
+    # depends_on:
+    #   - mongo
 
-    # Charger les variables d’environnement depuis .env
-    env_file:
-      - .env
-
-    # --- Différences avec la version dev ---
-    # Pas de volume pour synchroniser le code (code figé dans l’image)
-    # Pas de "dotnet watch", on utilise la commande par défaut du Dockerfile
-    # Redémarrage automatique en cas de plantage (utile en production)
+    # يتم حقن المتغيرات من بيئة الخادم (أو أسرار GitHub في حالتنا)
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - MongoDbSettings__ConnectionString=${MONGO_CONNECTION_STRING}
+      - MongoDbSettings__DatabaseName=${MONGO_DATABASE_NAME}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    
+    # ميزة مهمة للإنتاج: أعد تشغيل الحاوية دائمًا إذا توقفت
     restart: always
