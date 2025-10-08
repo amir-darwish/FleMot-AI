@@ -1,20 +1,16 @@
-# الملف: docker-compose.prod.yml
 services:
   api:
     container_name: flemot-api
-    # يبني الصورة باستخدام Dockerfile (الذي ينشئ النسخة المحسنة للإنتاج)
     build:
       context: ./backend
     
     ports:
       - "8000:8080"
 
-    # في الإنتاج الحقيقي، غالبًا ما تكون قاعدة البيانات خارجية،
-    # لذلك يمكن إزالة depends_on. لكن يمكننا تركه في CI/CD.
+
     # depends_on:
     #   - mongo
 
-    # يتم حقن المتغيرات من بيئة الخادم (أو أسرار GitHub في حالتنا)
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:8080
@@ -22,5 +18,4 @@ services:
       - MongoDbSettings__DatabaseName=${MONGO_DATABASE_NAME}
       - GEMINI_API_KEY=${GEMINI_API_KEY}
     
-    # ميزة مهمة للإنتاج: أعد تشغيل الحاوية دائمًا إذا توقفت
     restart: always
