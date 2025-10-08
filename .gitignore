@@ -52,3 +52,4 @@ yarn-error.log*
 
 # Cache du bundler (Metro)
 .metro-cache/
+/.env.prod
