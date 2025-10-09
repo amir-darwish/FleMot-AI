@@ -57,10 +57,10 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
   deploy:
     runs-on: self-hosted 
-    needs: test 
-    
-   
-    if: github.ref == 'refs/heads/main/develop'
+    needs: test
+      
+      
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
     
     steps:
       - name: Checkout repository
