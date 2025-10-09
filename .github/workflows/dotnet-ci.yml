@@ -19,3 +19,43 @@ jobs:
                   
       - name: Build project
         run: dotnet build ./backend --configuration Release
+      
+      - name: Upload  artifact  
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifact
+          path: ./backend/FleMot.Api/bin/Release/
+
+test:
+  runs-on: ubuntu-latest
+  needs: build
+  services:
+    mongo:
+      image: mongo:8.0
+      ports: 
+        - 27017:27017
+          
+steps:
+  - name: Checkout repository
+    uses: actions/checkout@v4
+    
+  - name: Setup .NET
+    uses: actions/setup-dotnet@v4
+    with:
+      dotnet-version: 9.0.x 
+              
+  - name: Download build artifact
+    uses: actions/download-artifact@v4
+    with:
+      name: build-artifact
+      path: ./backend/FleMot.Api/bin/Release/
+      
+  - name: Run tests
+    run: dotnet test ./backend/FleMot.Api.Tests --no-build
+    env:
+      MongoDbSettings__ConnectionString: "mongodb://localhost:27017"
+      MongoDbSettings__DatabaseName: "TestDb"
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
+      
+      
