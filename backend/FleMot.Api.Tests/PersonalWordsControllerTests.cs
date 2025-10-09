@@ -123,7 +123,7 @@ public class PersonalWordsControllerTests : IClassFixture<FleMotApiFactory>, IAs
 
         // --- ACT ---
         var secondResponse = await client.PostAsJsonAsync("/api/personalwords",
-            new SaveWordRequest("mot_existant", Array.Empty<ExamplePairDto>()));
+            new SaveWordRequest("mot_existant1", Array.Empty<ExamplePairDto>()));
         //Console.WriteLine($"=== Second POST === Status: {secondResponse.StatusCode}, Body: {secondBody}");
 
         // --- ASSERT ---
