@@ -55,3 +55,29 @@ jobs:
           MongoDbSettings__ConnectionString: "mongodb://localhost:27017"
           MongoDbSettings__DatabaseName: "TestDb"
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+  deploy:
+    runs-on: self-hosted 
+    needs: test 
+    
+   
+    if: github.ref == 'refs/heads/main/develop'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create production environment file
+        run: |
+          echo "MONGO_USER=${{ secrets.MONGO_USER }}" > .env.prod
+          echo "MONGO_PASSWORD=${{ secrets.MONGO_PASSWORD }}" >> .env.prod
+          echo "MONGO_CONNECTION_STRING=${{ secrets.MONGO_CONNECTION_STRING_PROD }}" >> .env.prod
+          echo "MONGO_DATABASE_NAME=FleMotDB_Prod" >> .env.prod
+          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env.prod
+
+      - name: Deploy to Server
+        run: |
+          echo "Stopping old containers..."
+          docker compose -f docker-compose.yml -f docker-compose.prod.yml down
+
+          echo "Building and starting new containers in production mode..."
+          docker compose --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml up -d --build
