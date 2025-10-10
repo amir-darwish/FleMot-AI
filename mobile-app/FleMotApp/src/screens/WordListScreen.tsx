@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React, { useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,8 +9,8 @@ import {
   ActivityIndicator
 } from 'react-native';
 import api from '../services/api';
-import {useAuth} from '../App';
-import { useNavigation, useFocusEffect} from '@react-navigation/native';
+import { useAuth } from '../App';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Feather';
 
 type PersonalWord = {
@@ -26,31 +26,31 @@ const WordListScreen = () => {
   const words = authContext?.savedWords ?? [];
   const isLoading = authContext?.isLoading ?? true;
 
-    useFocusEffect(
-      useCallback(() => {
-        authContext?.syncData();
-      }, [authContext])
-    );
+
+  useFocusEffect(
+    useCallback(() => {
+
+      authContext?.syncData();
+    }, [authContext?.syncData])
+  );
 
   const handleDelete = async (wordId: string) => {
     Alert.alert(
-      "Supprimer le mot",
-      "Êtes-vous sûr de vouloir supprimer ce mot de votre liste ?",
+      'Supprimer le mot',
+      'Êtes-vous sûr de vouloir supprimer ce mot de votre liste ?',
       [
-        { text: "Annuler", style: "cancel" },
+        { text: 'Annuler', style: 'cancel' },
         {
-          text: "Supprimer",
-          style: "destructive",
+          text: 'Supprimer',
+          style: 'destructive',
           onPress: async () => {
-             //  const originalWords = authContext?.savedWords ?? [];
-               authContext?.removeWord(wordId);
+            authContext?.removeWord(wordId);
 
             try {
               await api.delete(`/personalwords/${wordId}`);
-              authContext?.removeWord(wordId);
             } catch (error) {
-                console.error("Delete failed, probably offline.", error);
-                Alert.alert("Erreur", "L'opération a échoué. Vérifiez votre connexion internet.");
+              console.error('Delete failed, probably offline.', error);
+              Alert.alert('Erreur', "L'opération a échoué. Vérifiez votre connexion internet.");
             }
           }
         }

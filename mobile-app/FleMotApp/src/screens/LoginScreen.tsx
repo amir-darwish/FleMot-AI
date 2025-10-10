@@ -3,6 +3,7 @@ import { View, Text, Button, StyleSheet, Alert } from 'react-native';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { useAuth } from '../App';
 import auth, { GoogleAuthProvider } from '@react-native-firebase/auth';
+import Keychain from 'react-native-keychain';
 import axios from 'axios';
 
 const LoginScreen = () => {
@@ -22,6 +23,8 @@ const LoginScreen = () => {
       }
 
       const googleCredential = GoogleAuthProvider.credential(idToken);
+
+      await Keychain.setGenericPassword('firebase_token', idToken);
 
       const firebaseUserCredential = await auth().signInWithCredential(googleCredential);
       console.log('Connecté à Firebase ! Utilisateur:', firebaseUserCredential.user.uid);
