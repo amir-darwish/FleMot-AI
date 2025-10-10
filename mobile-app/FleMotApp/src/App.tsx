@@ -50,7 +50,7 @@ const App = () => {
     } catch (e) {
       console.error("Failed to sync data", e);
     }
-  }, [netInfo.isConnected]);
+  }, [userToken ,netInfo.isConnected]);
 
 
   useEffect(() => {

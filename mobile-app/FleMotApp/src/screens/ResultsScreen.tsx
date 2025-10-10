@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import api from '../services/api';
-import useAuth from '../App';
 
 
 type ExamplePair = { sentence: string; translation: string; };
@@ -13,7 +12,6 @@ const ResultsScreen = ({ route }: any) => {
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(isAlreadySaved);
   const [feedback, setFeedback] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-  const authContext = useAuth();
 
 
   useEffect(() => {
@@ -34,12 +32,12 @@ const ResultsScreen = ({ route }: any) => {
         word: searchResult.word,
         examples: searchResult.examples,
       };
-      const response = await api.post('/personalwords', saveData);
-//       const newSavedWord = response.data;
-//
-//       authContext?.addWord(newSavedWord);
-//
-//       console.log(authContext?.authContext);
+     const response = await api.post('/personalwords', saveData);
+      const newSavedWord = response.data;
+
+      authContext?.addWord(newSavedWord);
+
+      console.log(authContext?.authContext);
 
       setIsSaved(true);
       setFeedback({ message: `Le mot "${searchResult.word}" a été sauvegardé !`, type: 'success' });

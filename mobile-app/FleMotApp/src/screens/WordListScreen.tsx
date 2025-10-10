@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback} from 'react';
+import React, {useCallback} from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import api from '../services/api';
 import {useAuth} from '../App';
-import { useNavigation, useIsFocused, useFocusEffect} from '@react-navigation/native';
+import { useNavigation, useFocusEffect} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Feather';
 
 type PersonalWord = {
@@ -29,7 +29,7 @@ const WordListScreen = () => {
     useFocusEffect(
       useCallback(() => {
         authContext?.syncData();
-      }, [])
+      }, [authContext])
     );
 
   const handleDelete = async (wordId: string) => {
@@ -42,7 +42,7 @@ const WordListScreen = () => {
           text: "Supprimer",
           style: "destructive",
           onPress: async () => {
-               const originalWords = authContext?.savedWords ?? [];
+             //  const originalWords = authContext?.savedWords ?? [];
                authContext?.removeWord(wordId);
 
             try {
