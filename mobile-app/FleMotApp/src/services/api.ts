@@ -1,25 +1,48 @@
+// services/api.ts
 import axios from 'axios';
 import Keychain from 'react-native-keychain';
+import { getAuth } from 'firebase/auth';
 
 const api = axios.create({
   baseURL: 'http://10.0.2.2:8000/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
-
 
 api.interceptors.request.use(
   async (config) => {
-
     const credentials = await Keychain.getGenericPassword();
-
     if (credentials) {
       config.headers.Authorization = `Bearer ${credentials.password}`;
     }
     return config;
   },
-  (error) => {
+  (error) => Promise.reject(error)
+);
+
+// refresh token
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        const auth = getAuth();
+        const user = auth.currentUser;
+        if (user) {
+          const newToken = await user.getIdToken(true);
+
+          await Keychain.setGenericPassword('firebase_token', newToken);
+
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          return api(originalRequest);
+        }
+      } catch (refreshError) {
+        console.log('Token refresh failed:', refreshError);
+      }
+    }
+
     return Promise.reject(error);
   }
 );

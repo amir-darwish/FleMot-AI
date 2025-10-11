@@ -21,7 +21,7 @@ public class WordSaveService : IWordSaveService
         var user = await _userRepository.GetByAuthIdAsync(authId);
         if (user == null || user.Id == null)
         {
-            throw new UserNotFoundException(user.Id);
+            throw new UserNotFoundException(authId);
         }
 
         var exists = await _personalWordRepository.ExistsAsync(user.Id, data.Word);
