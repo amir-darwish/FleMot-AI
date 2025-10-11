@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  View, Text, TextInput, StyleSheet, Alert,Button,
+  View, Text, TextInput, StyleSheet, Alert,
   TouchableOpacity, ActivityIndicator
 } from 'react-native';
 import axios from 'axios';
@@ -32,8 +32,11 @@ const HomeScreen = () => {
         { word: word },
         { headers: { 'Authorization': `Bearer ${token}` } }
       );
-      const isAlreadySaved = authContext?.savedWords.has(word) ?? false;
-
+            let isAlreadySaved = false;
+            // On vérifie qu'authContext et savedWords existent ET sont bien un Set
+            if (authContext && authContext.savedWords && typeof authContext.savedWords.has === 'function') {
+                isAlreadySaved = authContext.savedWords.has(word);
+            }
       navigation.navigate('Results', { searchResult: response.data , isAlreadySaved: isAlreadySaved});
 
     } catch (error: any) {
