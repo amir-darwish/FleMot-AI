@@ -74,10 +74,20 @@ jobs:
           echo "MONGO_DATABASE_NAME=FleMotDB_Prod" >> .env.prod
           echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env.prod
 
-      - name: Deploy to Server
+      - name: Build, Tag, and Deploy with Version
         run: |
-          echo "Stopping old containers..."
-          docker compose -f docker-compose.yml -f docker-compose.prod.yml down
+          # 1. Read the version from the .csproj file
+          APP_VERSION=$(grep '<Version>' ./backend/FleMot.Api/FleMot.Api.csproj | sed -e 's/.*<Version>\(.*\)<\/Version>.*/\1/')
+          IMAGE_NAME="flemot-api"
+          
+          echo "Deploying version: $APP_VERSION"
 
-          echo "Building and starting new containers in production mode..."
-          docker compose --env-file .env.prod -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+          # 2. Stop and remove the old container (if it exists)
+          docker stop $IMAGE_NAME || true
+          docker rm $IMAGE_NAME || true
+
+          # 3. Build the new Docker image with a specific version tag
+          docker build -t ${IMAGE_NAME}:${APP_VERSION} ./backend
+
+          # 4. Start the new container using the new version tag
+          docker run -d --name $IMAGE_NAME -p 8001:8080 --network flemot-ai_default --env-file .env.prod ${IMAGE_NAME}:${APP_VERSION}
