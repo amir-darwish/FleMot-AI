@@ -95,6 +95,15 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Health Checks
+builder.Services.AddHealthChecks()
+    .AddMongoDb(sp => 
+            sp.GetRequiredService<IMongoDatabase>(), // Get the database service
+        name: "mongodb"
+    );
+
+
+
 
 var app = builder.Build();
 
@@ -114,6 +123,7 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 }
 app.MapControllers();
+app.MapGet("/health", () => Results.Ok("Healthy"));
 
 app.Run();
 public partial class Program { }
