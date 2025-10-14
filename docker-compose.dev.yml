@@ -30,4 +30,13 @@ services:
       - MongoDbSettings__DatabaseName=${MONGO_DATABASE_NAME}
       - GEMINI_API_KEY=${GEMINI_API_KEY}
     command: dotnet watch run --urls "http://*:8080"
+    
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s      
+      timeout: 10s        
+      retries: 3          
+      start_period: 10s  
+    
     # ---------------------------------------------------------
