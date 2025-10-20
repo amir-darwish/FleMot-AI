@@ -44,7 +44,7 @@ public class WordSaveService : IWordSaveService
         };
 
         await _personalWordRepository.CreateAsync(newPersonalWord);
-        user.WordCount += 1;
+        
         await _userRepository.IncrementWordCountAsync(user.Id);
         return newPersonalWord;
 

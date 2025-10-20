@@ -4,6 +4,7 @@ import HomeScreen from '../screens/HomeScreen';
 import ResultsScreen from '../screens/ResultsScreen';
 import WordListScreen from '../screens/WordListScreen'
 
+
 const Stack = createStackNavigator();
 
 const MainStackNavigator = () => {

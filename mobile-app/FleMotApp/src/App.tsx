@@ -8,6 +8,8 @@ import api from './services/api';
 import { useNetInfo } from '@react-native-community/netinfo';
 import LoginScreen from './screens/LoginScreen';
 import DrawerNavigator from './navigation/DrawerNavigator';
+import { createStackNavigator } from '@react-navigation/stack';
+import SignUpScreen from './screens/SignUpScreen';
 
 type PersonalWord = { id: string; word: string; examples: any[] };
 type AuthContextType = {
@@ -22,7 +24,7 @@ type AuthContextType = {
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
-
+const Stack = createStackNavigator();
 const App = () => {
   const [userToken, setUserToken] = useState<string | null>(null);
   const [savedWords, setSavedWords] = useState<PersonalWord[]>([]);
@@ -150,7 +152,22 @@ const App = () => {
   return (
     <AuthContext.Provider value={authContext}>
       <NavigationContainer>
-        {userToken == null ? <LoginScreen /> : <DrawerNavigator />}
+        {/* The StackNavigator is now the permanent root */}
+        <Stack.Navigator>
+          {isLoading ? (
+            // While loading, show a neutral loading screen
+            <Stack.Screen name="Loading" component={LoadingScreen} options={{ headerShown: false }} />
+          ) : userToken == null ? (
+            // If logged out, show the Auth screens
+            <>
+              <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+              <Stack.Screen name="SignUp" component={SignUpScreen} options={{ title: 'Créer un compte' }} />
+            </>
+          ) : (
+            // If logged in, show the main app (the Drawer)
+            <Stack.Screen name="AppDrawer" component={DrawerNavigator} options={{ headerShown: false }} />
+          )}
+        </Stack.Navigator>
       </NavigationContainer>
     </AuthContext.Provider>
   );
