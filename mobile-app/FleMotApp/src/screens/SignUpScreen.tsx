@@ -37,12 +37,12 @@ const SignUpScreen = () => {
       console.log(' JWT récupéré:', firebaseJwt);
 
       const response = await axios.post(
-        'http://10.0.2.2:8000/api/auth/register',
-        {},
-        {
-          headers: { Authorization: `Bearer ${firebaseJwt}` },
-        }
-      );
+              'http://10.0.2.2:8000/api/auth/register',
+              { firstName, lastName },
+              {
+                headers: { Authorization: `Bearer ${firebaseJwt}` },
+              }
+            );
 
       console.log('Utilisateur créé avec succès !', response.data);
       Alert.alert('Succès', 'Votre compte a été créé. Veuillez vous connecter.');

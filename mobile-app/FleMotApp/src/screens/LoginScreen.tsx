@@ -74,6 +74,7 @@ const LoginScreen = () => {
       const jwtToken = await userCredential.user.getIdToken();
 
       if (authContext && jwtToken) {
+        console.log(jwtToken);
         authContext.signIn(jwtToken);
       }
     } catch (error: any) {

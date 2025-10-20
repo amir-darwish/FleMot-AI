@@ -2,6 +2,7 @@ using FleMot.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using FleMot.Api.Models.DTOs;
 
 namespace FleMot.Api.Controllers;
 
@@ -18,14 +19,10 @@ public class AuthController : ControllerBase
 
     [HttpPost("register")]
     [Authorize]
-    public async Task<IActionResult> RegisterAsync()
+
+    public async Task<IActionResult> RegisterAsync([FromBody] RegisterRequest? request)
     {
-        var authId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (String.IsNullOrEmpty(authId))
-        {
-            return Unauthorized();
-        }
-        var user = await _userService.RegisterOrGetUserAsync(authId);
+        var user = await _userService.RegisterOrGetUserAsync(User, request); 
         return Ok(user);
     }
 }
