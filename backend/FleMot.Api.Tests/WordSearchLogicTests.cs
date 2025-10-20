@@ -32,7 +32,7 @@ public class WordSearchLogicTests : IClassFixture<FleMotApiFactory>
             
         };
         mockGeminiService
-            .Setup(s => s.GetExamplesAsync(It.IsAny<string>(), 2)) // Expect a request for 2
+            .Setup(s => s.GetExamplesAsync(It.IsAny<string>(), 2, It.IsAny<string>())) // Expect a request for 2
             .ReturnsAsync(fakeGeminiExamples); // Still return the full list
         var client = _factory.WithWebHostBuilder(builder =>
         {
@@ -80,7 +80,7 @@ public class WordSearchLogicTests : IClassFixture<FleMotApiFactory>
             new ExamplePairDto("Exemple 4", "Translation 4"),
         };
         mockGeminiService
-            .Setup(s => s.GetExamplesAsync(It.IsAny<string>(), 4)) 
+            .Setup(s => s.GetExamplesAsync(It.IsAny<string>(), 4, It.IsAny<string>())) // Expect a request for 4
             .ReturnsAsync(fakeGeminiExamples); // Still return the full list
         var client = _factory.WithWebHostBuilder(builder =>
         {

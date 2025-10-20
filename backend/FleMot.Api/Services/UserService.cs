@@ -59,4 +59,15 @@ public class UserService : IUserService
         await _userRepository.CreateAsync(newUser);
         return newUser;
     }
+    
+    public async Task UpdateUserLanguageAsync(string authId, string language)
+    {
+        var user = await _userRepository.GetByAuthIdAsync(authId); 
+        if (user == null || user.Id == null)
+        {
+            throw new UserNotFoundException(authId);
+        }
+
+        await _userRepository.UpdateLanguageAsync(user.Id, language);
+    }
 }

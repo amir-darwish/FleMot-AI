@@ -10,6 +10,9 @@ public interface IUserRepository
     Task IncrementWordCountAsync(string userId);
     
     Task DecrementWordCountAsync(string userId);
+    
+    Task UpdateLanguageAsync(string userId, string language);
+    
 }
     
     
