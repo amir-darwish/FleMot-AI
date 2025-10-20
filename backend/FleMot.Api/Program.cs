@@ -7,7 +7,12 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // هذا الخيار يخبر الخادم بأن لا يهتم بحالة الأحرف
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -42,7 +47,13 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        var firebaseProjectId = "flemotv2"; 
+        var firebaseProjectId = builder.Configuration["Firebase:ProjectId"];
+
+        if (string.IsNullOrEmpty(firebaseProjectId))
+        {
+            throw new Exception("Firebase ProjectId configuration is missing.");
+        }
+        
         options.Authority = $"https://securetoken.google.com/{firebaseProjectId}";
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -79,11 +90,29 @@ builder.Services.AddScoped<IMongoDatabase>(s =>
     s.GetRequiredService<IMongoClient>().GetDatabase(builder.Configuration.GetValue<string>("MongoDbSettings:DatabaseName")));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:8081", "http://10.0.2.2:8081") 
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
+// Health Checks
+builder.Services.AddHealthChecks()
+    .AddMongoDb(sp => 
+            sp.GetRequiredService<IMongoDatabase>(), // Get the database service
+        name: "mongodb"
+    );
+
+
 
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
+if (app.Environment.IsDevelopment() || app.Environment.IsProduction()) // this was added to test in server of salle 
 {
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "FleMot API v1"));
@@ -91,11 +120,15 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 
 
 app.UseRouting(); 
-
+app.UseCors("AllowFrontend");
 app.UseAuthentication(); 
-app.UseAuthorization();  
-app.UseDeveloperExceptionPage();
+app.UseAuthorization();
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
 app.MapControllers();
+app.MapGet("/health", () => Results.Ok("Healthy"));
 
 app.Run();
 public partial class Program { }
