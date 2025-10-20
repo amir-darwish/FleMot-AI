@@ -20,7 +20,7 @@ public class WordSearchService : IWordSearchService
         var user = await _userService.RegisterOrGetUserAsync(userPrincipal, null);
 
         var exampleCount = user.Role.Equals("premium", StringComparison.OrdinalIgnoreCase) ? 4 : 2;
-        var examples = await _geminiService.GetExamplesAsync(word, exampleCount);
+        var examples = await _geminiService.GetExamplesAsync(word, exampleCount, user.OriginalLanguage);
         return examples;
     }
 }

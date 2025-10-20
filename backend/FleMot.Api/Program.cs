@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        // هذا الخيار يخبر الخادم بأن لا يهتم بحالة الأحرف
+        
         options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
     });
 builder.Services.AddEndpointsApiExplorer();
