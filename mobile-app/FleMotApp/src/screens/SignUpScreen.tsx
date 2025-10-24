@@ -40,7 +40,7 @@ const SignUpScreen = () => {
     hasSpecialChar: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password),
   };
 
-``````````````````````````````````````````````````````````  const isPasswordValid = Object.values(passwordRequirements).every(Boolean);
+  const isPasswordValid = Object.values(passwordRequirements).every(Boolean);
 
   const validateForm = () => {
     if (!email || !password || !firstName || !lastName) {
@@ -189,7 +189,7 @@ const SignUpScreen = () => {
               </TouchableOpacity>
             </View>
 
-            {/* مؤشر قوة كلمة المرور */}
+
             <View style={styles.passwordStrengthContainer}>
               <Text style={styles.passwordStrengthTitle}>Exigences du mot de passe:</Text>
 
