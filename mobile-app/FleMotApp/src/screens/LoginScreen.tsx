@@ -43,7 +43,7 @@ const LoginScreen = () => {
       const firebaseJwt = await firebaseUserCredential.user.getIdToken();
       console.log('JWT récupéré:', firebaseJwt);
 
-      const response = await axios.post('http://10.0.2.2:8000/api/auth/register', {}, {
+      const response = await axios.post('https://nancee-nonadoptable-incisively.ngrok-free.dev/api/auth/register', {}, {
         headers: { 'Authorization': `Bearer ${firebaseJwt}` }
       });
 
@@ -96,6 +96,7 @@ const LoginScreen = () => {
       <TextInput
         style={styles.input}
         placeholder="Email"
+        placeholderTextColor="#999"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
@@ -105,6 +106,7 @@ const LoginScreen = () => {
       <TextInput
         style={styles.input}
         placeholder="Mot de passe"
+        placeholderTextColor="#999"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
