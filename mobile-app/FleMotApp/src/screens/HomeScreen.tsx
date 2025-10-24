@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, StyleSheet, Alert,
-  TouchableOpacity, ActivityIndicator
+  TouchableOpacity, ActivityIndicator,
+  KeyboardAvoidingView, Platform, Button,
+  ScrollView,
+  SafeAreaView
 } from 'react-native';
 import axios from 'axios';
 import Keychain from 'react-native-keychain';
@@ -28,7 +31,7 @@ const HomeScreen = () => {
       }
       const token = credentials.password;
 
-      const response = await axios.post('http://10.0.2.2:8000/api/words/search',
+      const response = await axios.post('https://nancee-nonadoptable-incisively.ngrok-free.dev/api/words/search',
         { word: word },
         { headers: { 'Authorization': `Bearer ${token}` } }
       );
@@ -48,28 +51,37 @@ const HomeScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Rechercher un mot </Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Entrez un mot français..."
-        value={word}
-        onChangeText={setWord}
-      />
-
-      <TouchableOpacity
-        style={styles.searchButton}
-        onPress={handleSearch}
-        disabled={isLoading}
+<SafeAreaView style={{ flex: 1, backgroundColor: '#F5F5F5' }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        {isLoading ? (
-          <ActivityIndicator size="small" color="#FFFFFF" />
-        ) : (
-          <Text style={styles.searchButtonText}>Rechercher</Text>
-        )}
-      </TouchableOpacity>
+        {/* 3. تغليف المحتوى بـ ScrollView */}
+        <ScrollView contentContainerStyle={styles.container}>
+          <Text style={styles.title}>Rechercher un mot</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Entrez un mot français..."
+            placeholderTextColor="#999"
+            value={word}
+            onChangeText={setWord}
+          />
 
-    </View>
+          <TouchableOpacity
+            style={styles.searchButton}
+            onPress={handleSearch}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator size="small" color="#FFFFFF" />
+            ) : (
+              <Text style={styles.searchButtonText}>Rechercher</Text>
+            )}
+          </TouchableOpacity>
+
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
