@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import api from '../services/api';
 import { searchWord as apiSearchWord } from '../services/api';
 
 import { PersonalWord } from '../types/word';
