@@ -35,14 +35,14 @@ public class WordListService : IWordListService
             throw new UserNotFoundException(authId);
         }
         
-        var wordToDelete = _personalWordRepository.GetByIdAsync(wordId);
+        var wordToDelete = await _personalWordRepository.GetByIdAsync(wordId);
         
-        if (wordToDelete == null || wordToDelete.Result == null)
+        if (wordToDelete == null )
         {
             throw new WordNotFoundException(wordId);
         }
         
-        if (wordToDelete.Result.UserId != user.Id)
+        if (wordToDelete.UserId != user.Id)
         {
             throw new UnauthorizedAccessException("You do not have permission to delete this word.");
         }

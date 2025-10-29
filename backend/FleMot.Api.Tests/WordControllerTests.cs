@@ -1,13 +1,12 @@
 using System.Net;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
+using System.Security.Claims;
 using FleMot.Api.Models.DTOs;
 using FleMot.Api.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Xunit;
 
 namespace FleMot.Api.Tests;
 
@@ -34,7 +33,7 @@ public class WordsControllerTests : IClassFixture<FleMotApiFactory>
         
         // Programmer la simulation pour qu'elle retourne nos faux exemples
         mockWordSearchService
-            .Setup(s => s.SearchAsync(It.IsAny<string>(), It.IsAny<string>()))
+            .Setup(s => s.SearchAsync(It.IsAny<string>(), It.IsAny<ClaimsPrincipal>()))
             .ReturnsAsync(fakeExamples);
 
         // 2. Créer un client HTTP configuré pour ce test spécifique

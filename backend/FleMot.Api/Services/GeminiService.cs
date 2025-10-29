@@ -17,7 +17,7 @@ public class GeminiService : IGeminiService
         _configuration = configuration;
     }
 
-    public async Task<ExamplePairDto[]> GetExamplesAsync(string word, int exampleCount)
+    public async Task<ExamplePairDto[]> GetExamplesAsync(string word, int exampleCount, string language = "English")
     {
         var apiKey = _configuration["GEMINI_API_KEY"];
         if (string.IsNullOrEmpty(apiKey))
@@ -26,7 +26,7 @@ public class GeminiService : IGeminiService
         }
         var apiUrl = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={apiKey}";
         
-        var prompt = $"Pour le mot français '{word}', génère {exampleCount} phrases d'exemples avec leur traduction en Anglais. " +
+        var prompt = $"Pour le mot français '{word}', génère {exampleCount} phrases d'exemples avec leur traduction en {language}. " +
                      $"**Si le mot '{word}' n'est pas un mot français valide, retourne un objet JSON avec une seule clé 'error' contenant le message 'Le mot n''est pas français.'.** " +
                      $"Sinon, fournis la réponse uniquement sous la forme d'un objet JSON contenant un tableau (array) nommé 'examples'. Chaque objet dans le tableau doit avoir deux clés : 'sentence' et 'translation'.";        
 
