@@ -1,10 +1,11 @@
 // services/api.ts
 import axios from 'axios';
+import { PersonalWord } from '../types/word';
 import Keychain from 'react-native-keychain';
 import { getAuth } from 'firebase/auth';
 
 const api = axios.create({
-  baseURL: 'http://10.0.2.2:8000/api',
+  baseURL: 'https://nancee-nonadoptable-incisively.ngrok-free.dev/api',
 });
 
 api.interceptors.request.use(
@@ -48,3 +49,13 @@ api.interceptors.response.use(
 );
 
 export default api;
+
+export const searchWord = async (token: string, word: string): Promise<PersonalWord[]> => {
+    try {
+        const response = await api.post('/words/search', { word }, { headers: { Authorization: `Bearer ${token}` } });
+        return response.data; // نتوقع أن الـ API ترجع array من PersonalWord أو شيء مشابه
+    } catch (error) {
+        console.error('API searchWord error:', error);
+        throw error;
+    }
+};

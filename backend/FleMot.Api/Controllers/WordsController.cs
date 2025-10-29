@@ -28,7 +28,7 @@ public class WordsController : ControllerBase
         var authId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (authId is null) return Unauthorized();
 
-        var examples = await _wordSearchService.SearchAsync(request.Word, authId);
+        var examples = await _wordSearchService.SearchAsync(request.Word, User);
 
         if (examples.Length == 0)
         {

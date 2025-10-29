@@ -1,6 +1,8 @@
 # --- Étape 1 : Construction ---
 # Image avec SDK .NET pour compiler
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build  
+RUN apt-get update && apt-get install -y curl
+
 
 # Dossier de travail
 WORKDIR /src  
@@ -23,6 +25,8 @@ RUN dotnet publish "FleMot.Api.csproj" -c Release -o /app/publish /p:UseAppHost=
 # --- Étape 2 : Image finale ---
 # Image runtime seulement (sans SDK)
 FROM mcr.microsoft.com/dotnet/aspnet:9.0  
+RUN apt-get update && apt-get install -y curl
+
 WORKDIR /app  
 
 # Copier fichiers publiés

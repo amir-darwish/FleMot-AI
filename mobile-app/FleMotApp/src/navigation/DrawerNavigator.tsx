@@ -5,7 +5,7 @@ import { Button } from 'react-native';
 import MainStackNavigator from './MainStackNavigator'; //
 //import WordListScreen from '../screens/WordListScreen';
 import SubscriptionScreen from '../screens/SubscriptionScreen';
-import { useAuth } from '../App';
+import { useAuth } from '../context/AuthContext';
 
 const Drawer = createDrawerNavigator();
 
