@@ -8,7 +8,7 @@ import {
   GoogleAuthProvider,
   signInWithCredential
 } from '@react-native-firebase/auth';
-import { useAuth } from '../App';
+import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import Keychain from 'react-native-keychain';
 import axios from 'axios';
