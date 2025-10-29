@@ -9,8 +9,9 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import api from '../services/api';
-import { useAuth } from '../App';
+import { useAuth } from '../context/AuthContext';
 import Icon from 'react-native-vector-icons/Feather';
+import Toast from 'react-native-toast-message';
 
 
 type ExamplePair = { sentence: string; translation: string };
