@@ -10,8 +10,18 @@ import {
 } from '@react-native-firebase/auth';
 import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
-import Keychain from 'react-native-keychain';
 import axios from 'axios';
+
+const mapUserRole = (role: unknown): 'Standard' | 'Premium' => {
+  switch (role) {
+    case 'standard':
+      return 'Standard';
+    case 'premium':
+      return 'Premium';
+    default:
+      throw new Error("Le rôle du profil utilisateur n'est pas reconnu.");
+  }
+};
 
 const LoginScreen = () => {
   const authContext = useAuth();
@@ -24,39 +34,48 @@ const LoginScreen = () => {
   const app = getApp();
   const auth = getAuth(app);
 
+  const cleanupFailedLogin = async () => {
+    try {
+      await authContext.signOut();
+    } catch {
+      console.error('Nettoyage de la connexion incomplet.');
+    }
+  };
+
   // --- Connexion Google ---
   const handleGoogleLogin = async () => {
+    let firebaseAuthenticated = false;
     try {
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
       const userInfo = await GoogleSignin.signIn();
 
-      const idToken = userInfo.data?.idToken || userInfo.idToken;
+      if (userInfo.type === 'cancelled') return;
+      const idToken = userInfo.data.idToken;
       if (!idToken) throw new Error('Google Sign-In failed to return an ID token.');
 
       const googleCredential = GoogleAuthProvider.credential(idToken);
 
-      await Keychain.setGenericPassword('firebase_token', idToken);
-
       const firebaseUserCredential = await signInWithCredential(auth, googleCredential);
-      console.log('Connecté à Firebase ! UID:', firebaseUserCredential.user.uid);
+      firebaseAuthenticated = true;
+      console.log('Connecté à Firebase !');
 
       const firebaseJwt = await firebaseUserCredential.user.getIdToken();
-      console.log('JWT récupéré:', firebaseJwt);
 
-      const response = await axios.post('https://nancee-nonadoptable-incisively.ngrok-free.dev/api/auth/register', {}, {
+      const response = await axios.post<{ role: unknown }>('https://nancee-nonadoptable-incisively.ngrok-free.dev/api/auth/register', {}, {
         headers: { 'Authorization': `Bearer ${firebaseJwt}` }
       });
 
-      console.log('Utilisateur enregistré dans notre BDD:', response.data);
+      console.log('Utilisateur enregistré dans notre BDD.');
 
       if (authContext && firebaseJwt) {
-        authContext.signIn(firebaseJwt);
+        await authContext.signIn(firebaseJwt, mapUserRole(response.data.role));
       } else {
         throw new Error("Auth context n'est pas disponible.");
       }
 
     } catch (error: any) {
-      console.error('Erreur Google:', error);
+      if (firebaseAuthenticated) await cleanupFailedLogin();
+      console.error('Erreur lors de la connexion Google.');
       Alert.alert('Erreur', error.message || 'Une erreur est survenue lors de la connexion Google.');
     }
   };
@@ -68,17 +87,22 @@ const LoginScreen = () => {
       return;
     }
 
+    let firebaseAuthenticated = false;
     setIsLoading(true);
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      firebaseAuthenticated = true;
       const jwtToken = await userCredential.user.getIdToken();
 
       if (authContext && jwtToken) {
-        console.log(jwtToken);
-        authContext.signIn(jwtToken);
+        const response = await axios.post<{ role: unknown }>('https://nancee-nonadoptable-incisively.ngrok-free.dev/api/auth/register', {}, {
+          headers: { 'Authorization': `Bearer ${jwtToken}` }
+        });
+        await authContext.signIn(jwtToken, mapUserRole(response.data.role));
       }
     } catch (error: any) {
-      console.error('Erreur email login:', error);
+      if (firebaseAuthenticated) await cleanupFailedLogin();
+      console.error('Erreur lors de la connexion e-mail.');
       if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
         Alert.alert('Erreur', 'E-mail ou mot de passe incorrect.');
       } else {

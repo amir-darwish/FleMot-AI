@@ -6,7 +6,7 @@ import { PersonalWord } from '../types/word';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const useWordList = () => {
-    const { userToken, removeWord, addWord } = useAuth();
+    const { userToken, removeWord } = useAuth();
     const [words, setWords] = useState<PersonalWord[]>([]);
     const [isSyncing, setIsSyncing] = useState(false);
 

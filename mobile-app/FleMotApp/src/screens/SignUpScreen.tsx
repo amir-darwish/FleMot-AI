@@ -70,9 +70,8 @@ const SignUpScreen = () => {
       });
 
       const firebaseJwt = await getIdToken(userCredential.user);
-      console.log(' JWT récupéré:', firebaseJwt);
 
-      const response = await axios.post(
+      await axios.post(
         'https://nancee-nonadoptable-incisively.ngrok-free.dev/api/auth/register',
         { firstName, lastName },
         {
@@ -80,12 +79,12 @@ const SignUpScreen = () => {
         }
       );
 
-      console.log('Utilisateur créé avec succès !', response.data);
+      console.log('Utilisateur créé avec succès !');
       Alert.alert('Succès', 'Votre compte a été créé. Veuillez vous connecter.');
       navigation.goBack();
 
     } catch (error: any) {
-      console.error('Firebase SignUp error:', error);
+      console.error('Erreur lors de la création du compte.');
       if (error.code === 'auth/email-already-in-use') {
         Alert.alert('Erreur', 'Cet e-mail est déjà utilisé.');
       } else if (error.code === 'auth/weak-password') {
@@ -98,7 +97,7 @@ const SignUpScreen = () => {
     }
   };
 
-  const RequirementItem = ({ met, text }) => (
+  const RequirementItem = ({ met, text }: { met: boolean; text: string }) => (
     <View style={styles.requirementItem}>
       <Icon
         name={met ? "check" : "x"}

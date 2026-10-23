@@ -191,6 +191,14 @@ public class PersonalWordsControllerTests : IClassFixture<FleMotApiFactory>, IAs
 
         var createdWord = await createResponse.Content.ReadFromJsonAsync<PersonalWord>();
         Assert.NotNull(createdWord);
+        Assert.False(string.IsNullOrWhiteSpace(createdWord.Id));
+
+        using (var scope = _scopeFactory.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<IMongoDatabase>();
+            var words = db.GetCollection<PersonalWord>("personalWords");
+            Assert.Equal(1, await words.CountDocumentsAsync(w => w.Id == createdWord.Id));
+        }
 
         // --- ACT ---
         var deleteResponse = await client.DeleteAsync($"/api/personalwords/{createdWord!.Id}");
@@ -202,7 +210,7 @@ public class PersonalWordsControllerTests : IClassFixture<FleMotApiFactory>, IAs
         using (var scope = _scopeFactory.CreateScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<IMongoDatabase>();
-            var words = db.GetCollection<PersonalWord>("personalwords");
+            var words = db.GetCollection<PersonalWord>("personalWords");
             var wordCountInDb = await words.CountDocumentsAsync(w => w.Id == createdWord.Id);
             Assert.Equal(0, wordCountInDb);
         }

@@ -67,12 +67,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // 🚪 تسجيل الخروج
     //
     const signOut = async () => {
-        await firebaseSignOut();
-        await clearUserToken();
-        await clearLocalWords();
+        const results = await Promise.allSettled([
+            firebaseSignOut(),
+            clearUserToken(),
+            clearLocalWords(),
+        ]);
         setUserToken(null);
         setSavedWords([]);
         setUserRole(null);
+        setIsLoading(false);
+        if (results.some(result => result.status === 'rejected')) {
+            throw new Error('Le nettoyage de la session est incomplet.');
+        }
     };
 
     //
