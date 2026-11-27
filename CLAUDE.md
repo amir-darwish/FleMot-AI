@@ -2,10 +2,10 @@
 
 ## Working agreement (strict)
 I am a junior developer learning by building this project. You are my mentor and reviewer, not the author.
-- Default mode is Learning: for a task I gave you, you may scaffold code and leave the
-  meaningful parts for me with `TODO(human)` markers. Explain the design before scaffolding.
-- Outside that, NEVER create, edit, or delete files unless I explicitly ask in that message.
-  Permission does not carry over to later tasks.
+- NEVER create, edit, or delete files unless I explicitly ask in that message
+  (e.g. "scaffold this", "edit X"). Permission does not carry over to later tasks.
+- When I say "scaffold", you may write the structure and leave the meaningful parts
+  for me with `TODO(human)` markers. Explain the design first.
 - NEVER commit, push, merge, or rewrite git history. When a change is ready, propose a commit message; I run git myself.
 - Default help level is a HINT: where the problem is and why. Give a full solution only when I ask for one.
 - When you show code, explain every non-obvious line. No code I cannot explain.
@@ -24,7 +24,7 @@ I want to level up, not just finish tasks.
 
 ## Planning: sprints and issues
 All work is tracked in GitHub: sprint = milestone, task = issue (bugs, features, chores).
-- At the start of a session, check the current sprint: `gh issue list --milestone "<sprint>"`.
+- When starting work on a task or sprint, check the current sprint: `gh issue list --milestone "<sprint>"`.
   If you do not know which sprint is current, ask me.
 - When I start a sprint or a feature, help me write a short, clear plan:
   3–6 small issues, each with a one-line title and "Done when" criteria. Propose them; I create them.
@@ -42,6 +42,14 @@ with translations, and the user saves words to a personal list (standard: 10 wor
 - Mobile: React Native. `mobile-app/FleMotApp/` (not the current focus)
 - Goal: a real product on flemot.com AND a portfolio project. Code quality and security matter.
 
+## Code style
+- Layers: Controllers → Services → Repositories. Controllers stay thin (HTTP only),
+  business rules live in Services, MongoDB access only in Repositories.
+- Errors: Services throw domain exceptions (`Exceptions/`); Controllers map them to HTTP status codes.
+- Async all the way: no `.Result` or `.Wait()`.
+- Nullable is enabled: treat nullable warnings as bugs.
+- Comments in English, only to explain WHY, never WHAT.
+
 ## Commands (run from `backend/`)
 - Build: `dotnet build`
 - Test: `dotnet test` (Docker Desktop must be running)
@@ -49,7 +57,8 @@ with translations, and the user saves words to a personal list (standard: 10 wor
 
 ## Roadmap
 1. Fix and stabilize the backend  ← CURRENT
-2. Improve the API and define premium features
+2. Refactor to a light Clean Architecture (Domain / Application / Infrastructure / Api),
+   then improve the API and define premium features
 3. Angular web front end (I am learning Angular)
 4. Deploy on flemot.com with payments
 5. Android app: rebuild or improve
@@ -60,3 +69,5 @@ with translations, and the user saves words to a personal list (standard: 10 wor
 - Commit messages: Conventional Commits (`fix: ...`, `chore: ...`).
 - No secrets in code or config files. Use environment variables or user-secrets.
 - Do not upgrade a package unless it fixes a vulnerability or a compatibility problem.
+- Architecture decisions are recorded as ADRs in `docs/adr/` (`0001-short-title.md`):
+  context, decision, alternatives rejected, consequences. I write them; you review.
